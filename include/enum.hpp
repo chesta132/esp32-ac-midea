@@ -6,6 +6,7 @@ String modeToString(uint8_t);
 String fanSpeedToString(uint8_t);
 
 enum AcPin : uint8_t {
+  // Controller Pins (V0 - V9)
   PIN_POWER = 0,
   PIN_TEMP,
   PIN_MODE,
@@ -16,7 +17,23 @@ enum AcPin : uint8_t {
   PIN_LED,
   PIN_TIMER_ON,
   PIN_TIMER_OFF,
+
+  // Remote Pins (V10 - V19)
+  PIN_REMOTE_POWER,
+  PIN_REMOTE_TEMP,
+  PIN_REMOTE_MODE,
+  PIN_REMOTE_FAN,
+  PIN_REMOTE_SWING,
+  PIN_REMOTE_SLEEP,
+  PIN_REMOTE_CLEAN,
+  PIN_REMOTE_LED,
+  PIN_REMOTE_TIMER_ON,
+  PIN_REMOTE_TIMER_OFF,
+
+  // System Control Pin (V20)
   PIN_ESP_ON_CONTROL,
+
+  // Total count indicator for SyncGuard
   PIN_COUNT
 };
 

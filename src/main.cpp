@@ -148,6 +148,88 @@ BLYNK_WRITE(V9) {  // Timer off (param: hours, ac: minutes)
       [](uint16_t v) { acControl.ac.setOffTimer(v); }, "timer off (minutes)");
 }
 
+// Remote (sync only)
+BLYNK_WRITE(V10) {  // Remote Power
+  handleAcUpdate<bool>(
+      PIN_REMOTE_POWER, param.asInt() == 1, acReceiverState.power,
+      [](bool v) {
+        if (v)
+          acReceive.ac.on();
+        else
+          acReceive.ac.off();
+      },
+      "remote power", false, nullptr, false);
+}
+
+BLYNK_WRITE(V11) {  // Remote Temp
+  handleAcUpdate<uint8_t>(
+      PIN_REMOTE_TEMP, param.asInt(), acReceiverState.temp,
+      [](uint8_t v) { acReceive.ac.setTemp(v, true); },
+      "remote temperature (celsius)", true, nullptr, false);
+}
+
+BLYNK_WRITE(V12) {  // Remote Mode
+  handleAcUpdate<uint8_t>(
+      PIN_REMOTE_MODE, param.asInt(), acReceiverState.mode,
+      [](uint8_t v) { acReceive.ac.setMode(v); }, "remote mode", true,
+      modeToString, false);
+}
+
+BLYNK_WRITE(V13) {  // Remote Fan Speed
+  handleAcUpdate<uint8_t>(
+      PIN_REMOTE_FAN, param.asInt(), acReceiverState.fanSpeed,
+      [](uint8_t v) { acReceive.ac.setFan(v); }, "remote fan speed", true,
+      fanSpeedToString, false);
+}
+
+BLYNK_WRITE(V14) {  // Remote Swing
+  handleAcUpdate<bool>(
+      PIN_REMOTE_SWING, param.asInt() == 1, acReceiverState.swing,
+      [](bool v) { acReceive.ac.setSwingVToggle(v); }, "remote swing", true,
+      nullptr, false);
+}
+
+BLYNK_WRITE(V15) {  // Remote Sleep
+  handleAcUpdate<bool>(
+      PIN_REMOTE_SLEEP, param.asInt() == 1, acReceiverState.sleep,
+      [](bool v) { acReceive.ac.setSleep(v); }, "remote sleep", true, nullptr,
+      false);
+}
+
+BLYNK_WRITE(V16) {  // Remote Clean
+  handleAcUpdate<bool>(
+      PIN_REMOTE_CLEAN, param.asInt() == 1, acReceiverState.clean,
+      [](bool v) { acReceive.ac.setCleanToggle(v); }, "remote clean", true,
+      nullptr, false);
+}
+
+BLYNK_WRITE(V17) {  // Remote LED Display
+  handleAcUpdate<bool>(
+      PIN_REMOTE_LED, param.asInt() == 1, acReceiverState.ledDisplay,
+      [](bool v) { acReceive.ac.setLightToggle(v); }, "remote LED display",
+      true, nullptr, false);
+}
+
+BLYNK_WRITE(V18) {  // Remote Timer on (param: hours, ac: minutes)
+  uint16_t dummyState;
+  uint16_t minutes = static_cast<uint16_t>(round(param.asDouble() * 60.0));
+  handleAcUpdate<uint16_t>(
+      PIN_REMOTE_TIMER_ON, minutes, dummyState,
+      [](uint16_t v) { acReceive.ac.setOnTimer(v); },
+      "remote timer on (minutes)", true, nullptr, false);
+}
+
+BLYNK_WRITE(V19) {  // Remote Timer off (param: hours, ac: minutes)
+  uint16_t dummyState;
+  uint16_t minutes = static_cast<uint16_t>(round(param.asDouble() * 60.0));
+  handleAcUpdate<uint16_t>(
+      PIN_REMOTE_TIMER_OFF, minutes, dummyState,
+      [](uint16_t v) { acReceive.ac.setOffTimer(v); },
+      "remote timer off (minutes)", true, nullptr, false);
+}
+
+// Middle
+
 BLYNK_WRITE(V20) {  // ESP On Control
   bool dummyState;
   bool value = param.asInt() == 1;
