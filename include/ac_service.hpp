@@ -57,4 +57,4 @@ class AcService {
   IRMideaAC ac;
 };
 
-AcService acService(PIN_IR_LED);
+extern AcService acService;

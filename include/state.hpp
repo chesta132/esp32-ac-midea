@@ -16,6 +16,6 @@ struct AcState {
   // v9 = timer off (hours)
 };
 
-AcState acState;
+extern AcState acState;
 
 #endif
