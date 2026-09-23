@@ -19,6 +19,8 @@ enum AcPin : uint8_t {
   PIN_COUNT
 };
 
+// DO NOT USE THIS ENUM ON BLYNK_WRITE
+// use V0-Vn instead
 enum VirtualPin : uint8_t {
   // ESP controller state
 
