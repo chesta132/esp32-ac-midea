@@ -7,6 +7,7 @@
 
 #include "ac_service.hpp"
 #include "config.hpp"
+#include "enum.hpp"
 #include "state.hpp"
 #include "sync_guard.hpp"
 
@@ -40,14 +41,16 @@ BLYNK_CONNECTED() {
 template <typename T>
 void handleAcUpdate(AcPin pin, T val, T& stateVar,
                     std::function<void(T)> applyFunc, const char* name,
-                    bool isLowPriority = true) {
+                    bool isLowPriority = true,
+                    std::function<String(T)> toStr = nullptr) {
   applyFunc(val);
   stateVar = val;
+  String val_in_log = toStr ? toStr(val) : String(val);
 
   if (std::is_same<T, bool>::value) {
     LOG_INFO("AC {} state changed to: {}", name, val ? "ON" : "OFF");
   } else {
-    LOG_INFO("AC {} changed to: {}", name, val);
+    LOG_INFO("AC {} changed to: {}", name, val_in_log.c_str());
   }
 
   if (isLowPriority) {
@@ -81,13 +84,14 @@ BLYNK_WRITE(V1) {  // Temperature
 BLYNK_WRITE(V2) {  // Mode
   handleAcUpdate<uint8_t>(
       PIN_MODE, param.asInt(), acState.mode,
-      [](uint8_t v) { acService.ac.setMode(v); }, "mode");
+      [](uint8_t v) { acService.ac.setMode(v); }, "mode", true, modeToString);
 }
 
 BLYNK_WRITE(V3) {  // Fan Speed
   handleAcUpdate<uint8_t>(
       PIN_FAN, param.asInt(), acState.fan_speed,
-      [](uint8_t v) { acService.ac.setFan(v); }, "fan speed");
+      [](uint8_t v) { acService.ac.setFan(v); }, "fan speed", true,
+      fanSpeedToString);
 }
 
 BLYNK_WRITE(V4) {  // Swing
