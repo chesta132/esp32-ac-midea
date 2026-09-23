@@ -44,8 +44,8 @@ class AcReceiverService {
       double timerOn = ac.getOnTimer() / 60;
       double timerOff = ac.getOffTimer() / 60;
 
-      if (acEspOnControl) {
-        acEspOnControl = false;
+      if (acControlState.isEspOnControl()) {
+        acControlState.set(false);
 
         SYNC_IF_CHANGED(power, VPFPowerSwitch, power ? 1 : 0);
         SYNC_IF_CHANGED(temp, VPFTemperature, temp);

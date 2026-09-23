@@ -25,6 +25,11 @@ class AcControllerService {
       return;
     }
 
+    if (!acControlState.isEspOnControl()) {
+      LOG_INFO("ESP is not on control, skipping sending IR command.");
+      return;
+    }
+
     beforeSend_();
     ac.send();
   }
@@ -32,6 +37,11 @@ class AcControllerService {
   void sendLowPriority(SyncGuard& syncGuard) {
     if (syncGuard.isSyncing()) {
       LOG_INFO("Syncing, skipping sending IR command.");
+      return;
+    }
+
+    if (!acControlState.isEspOnControl()) {
+      LOG_INFO("ESP is not on control, skipping sending IR command.");
       return;
     }
 
@@ -47,10 +57,10 @@ class AcControllerService {
 
  private:
   void beforeSend_() {
-    if (!acEspOnControl) {
-      acEspOnControl = true;
-      LOG_INFO("AC ESP is taking control.");
-    }
+    // if (!acControlState.isEspOnControl()) {
+    //   acControlState.set(true);
+    //   LOG_INFO("AC ESP is taking control.");
+    // }
   }
 };
 

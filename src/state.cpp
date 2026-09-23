@@ -1,4 +1,5 @@
 #include "state.hpp"
+#include "enum.hpp"
 
 #include <Arduino.h>
 #include <IRremoteESP8266.h>
@@ -26,4 +27,4 @@ AcState acReceiverState = {.power = false,
                            .timerOn = 0.0,
                            .timerOff = 0.0};
 
-bool acEspOnControl = false;
+ControlModeState acControlState;

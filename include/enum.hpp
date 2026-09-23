@@ -16,6 +16,7 @@ enum AcPin : uint8_t {
   PIN_LED,
   PIN_TIMER_ON,
   PIN_TIMER_OFF,
+  PIN_ESP_ON_CONTROL,
   PIN_COUNT
 };
 
@@ -46,5 +47,7 @@ enum VirtualPin : uint8_t {
   VPFClean,        // V16
   VPFLedDisplay,   // V17
   VPFTimerOn,      // V18
-  VPFTimerOff      // V19
+  VPFTimerOff,     // V19
+
+  VPControlOnESP  // V20
 };
