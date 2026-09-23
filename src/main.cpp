@@ -78,7 +78,7 @@ BLYNK_WRITE(V0) {  // Power
 BLYNK_WRITE(V1) {  // Temperature
   handleAcUpdate<uint8_t>(
       PIN_TEMP, param.asInt(), acState.temp,
-      [](uint8_t v) { acService.ac.setTemp(v); }, "temperature");
+      [](uint8_t v) { acService.ac.setTemp(v, true); }, "temperature (celsius)");
 }
 
 BLYNK_WRITE(V2) {  // Mode
