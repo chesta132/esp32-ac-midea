@@ -7,8 +7,17 @@
 AcState acState = {.power = false,
                    .temp = 25,
                    .mode = kMideaACAuto,
-                   .fan_speed = kMideaACFanAuto,
+                   .fanSpeed = kMideaACFanAuto,
                    .swing = false,
                    .sleep = false,
                    .clean = false,
                    .ledDisplay = true};
+
+AcState acStateReceived = {.power = false,
+                           .temp = 25,
+                           .mode = kMideaACAuto,
+                           .fanSpeed = kMideaACFanAuto,
+                           .swing = false,
+                           .sleep = false,
+                           .clean = false,
+                           .ledDisplay = true};

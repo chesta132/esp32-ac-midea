@@ -1,3 +1,3 @@
-#include "ac_service.hpp"
+#include "service/ac_controller.hpp"
 
-AcService acService(PIN_IR_LED);
+AcControllerService acControl(PIN_IR_LED);
