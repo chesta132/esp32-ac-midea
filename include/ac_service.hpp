@@ -19,6 +19,8 @@ enum AcPin : uint8_t {
   PIN_SLEEP,
   PIN_CLEAN,
   PIN_LED,
+  PIN_TIMER_ON,
+  PIN_TIMER_OFF,
   PIN_COUNT
 };
 

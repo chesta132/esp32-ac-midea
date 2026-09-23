@@ -113,3 +113,19 @@ BLYNK_WRITE(V7) {  // LED Display
       PIN_LED, param.asInt() == 1, acState.ledDisplay,
       [](bool v) { acService.ac.setLightToggle(v); }, "LED display");
 }
+
+BLYNK_WRITE(V8) {  // Timer on (param: hours, ac: minutes)
+  uint16_t dummyState;
+  uint16_t minutes = static_cast<uint16_t>(round(param.asDouble() * 60.0));
+  handleAcUpdate<uint16_t>(
+      PIN_TIMER_ON, minutes, dummyState,
+      [](uint16_t v) { acService.ac.setOnTimer(v); }, "timer on (minutes)");
+}
+
+BLYNK_WRITE(V9) {  // Timer off (param: hours, ac: minutes)
+  uint16_t dummyState;
+  uint16_t minutes = static_cast<uint16_t>(round(param.asDouble() * 60.0));
+  handleAcUpdate<uint16_t>(
+      PIN_TIMER_OFF, minutes, dummyState,
+      [](uint16_t v) { acService.ac.setOffTimer(v); }, "timer off (minutes)");
+}

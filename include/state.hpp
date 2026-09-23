@@ -11,7 +11,9 @@ struct AcState {
   bool swing;         // v4
   bool sleep;         // v5
   bool clean;         // v6
-  bool ledDisplay;   // v7
+  bool ledDisplay;    // v7
+  // v8 = timer on (hours)
+  // v9 = timer off (hours)
 };
 
 AcState acState;
