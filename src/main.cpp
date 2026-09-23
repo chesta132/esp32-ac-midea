@@ -36,7 +36,8 @@ void loop() {
 }
 
 BLYNK_CONNECTED() {
-  LOG_INFO("Blynk connected, syncing virtual pins.");
+  LOG_INFO(
+      "Blynk connected, syncing virtual pins. Can not send IR while syncing.");
   syncGuard.begin(PIN_COUNT);
   syncGuard.onFinished([](SyncGuard::Callback pc) {
     LOG_INFO("Sync finished.\n");
@@ -63,7 +64,7 @@ void handleAcUpdate(AcPin pin, T val, T& stateVar,
     LOG_INFO("AC {} changed to: {}", name, val_in_log.c_str());
   }
 
-  if (send) {
+  if (send && !syncGuard.isSyncing()) {
     if (isLowPriority) {
       acControl.sendLowPriority(syncGuard);
     } else {
@@ -79,7 +80,6 @@ BLYNK_WRITE(V0) {  // Power
   handleAcUpdate<bool>(
       PIN_POWER, param.asInt() == 1, acControllerState.power,
       [](bool v) {
-        Serial1.println(2);
         if (v)
           acControl.ac.on();
         else
