@@ -21,16 +21,15 @@ class SyncGuard {
   void tick(uint8_t pin) {
     if (!active_) return;
     pending_mask_ &= ~(1UL << pin);
-    if (pending_mask_ == 0) active_ = false;
+    if (pending_mask_ == 0) finishCallback();
   }
 
   // Call once per loop() to expire a sync that never finished
   // (e.g. a datastream missing the "sync with latest value" option).
   void checkTimeout(unsigned long timeout_ms) {
     if (active_ && (millis() - start_time_ms_ > timeout_ms)) {
-      active_ = false;
       pending_mask_ = 0;
-      invokeCallback();
+      finishCallback();
     }
   }
 
@@ -54,7 +53,8 @@ class SyncGuard {
   bool active_ = false;
   unsigned long start_time_ms_ = 0;
   Callback callback_{nullptr};
-  void invokeCallback() {
+  void finishCallback() {
+    active_ = false;
     if (callback_) callback_();
   }
 };
