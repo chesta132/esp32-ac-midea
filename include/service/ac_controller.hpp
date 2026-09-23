@@ -24,6 +24,8 @@ class AcControllerService {
       LOG_INFO("Syncing, skipping sending IR command.");
       return;
     }
+
+    beforeSend_();
     ac.send();
   }
 
@@ -33,7 +35,8 @@ class AcControllerService {
       return;
     }
 
-    if (acState.power) {
+    if (acControllerState.power) {
+      beforeSend_();
       ac.send();
     } else {
       LOG_INFO("Change's not applied because AC is OFF.");
@@ -41,6 +44,14 @@ class AcControllerService {
   }
 
   IRMideaAC ac;
+
+ private:
+  void beforeSend_() {
+    if (!acEspOnControl) {
+      acEspOnControl = true;
+      LOG_INFO("AC ESP is taking control.");
+    }
+  }
 };
 
 extern AcControllerService acControl;

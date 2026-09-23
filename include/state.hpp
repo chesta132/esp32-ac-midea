@@ -4,19 +4,23 @@
 #include <stdint.h>
 
 struct AcState {
-  bool power;        // v0
-  uint8_t temp;      // v1
-  uint8_t mode;      // v2
-  uint8_t fanSpeed;  // v3
-  bool swing;        // v4
-  bool sleep;        // v5
-  bool clean;        // v6
-  bool ledDisplay;   // v7
-  // v8 = timer on (hours)
-  // v9 = timer off (hours)
+  bool power;
+  uint8_t temp;
+  uint8_t mode;
+  uint8_t fanSpeed;
+  bool swing;
+  bool sleep;
+  bool clean;
+  bool ledDisplay;
+  double timerOn;
+  double timerOff;
 };
 
-extern AcState acState;
-extern AcState acStateReceived;
+extern AcState acControllerState;
+extern AcState acReceiverState;
+
+// true: acControllerState is the state that controlling the AC
+// false: acReceiverState is the state that controlling the AC
+extern bool acEspOnControl;
 
 #endif
