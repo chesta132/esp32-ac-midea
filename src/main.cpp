@@ -8,6 +8,7 @@
 #include "config.hpp"
 #include "enum.hpp"
 #include "service/ac_controller.hpp"
+#include "service/ac_receiver.hpp"
 #include "state.hpp"
 #include "sync_guard.hpp"
 
@@ -19,14 +20,15 @@ void setup() {
   LOG_BEGIN(9600);
 
   acControl.begin();
-  // acReceiver.begin();
-  // don't begin acParse
+  acReceive.begin(
+      [](uint8_t pin, int value) { Blynk.virtualWrite(pin, value); });
   Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS);
 }
 
 void loop() {
   Blynk.run();
   syncGuard.checkTimeout(SYNC_TIMEOUT_MS);
+  acReceive.loop();
 }
 
 BLYNK_CONNECTED() {
@@ -48,6 +50,7 @@ void handleAcUpdate(AcPin pin, T val, T& stateVar,
   applyFunc(val);
   stateVar = val;
   String val_in_log = toStr ? toStr(val) : String(val);
+  Serial1.println(3);
 
   if (std::is_same<T, bool>::value) {
     LOG_INFO("AC {} state changed to: {}", name, val ? "ON" : "OFF");
@@ -61,14 +64,18 @@ void handleAcUpdate(AcPin pin, T val, T& stateVar,
     acControl.send(syncGuard);
   }
 
+  Serial1.println(4);
   syncGuard.tick(pin);
+  Serial1.println(5);
 }
 
 // Blynk pin handlers
 BLYNK_WRITE(V0) {  // Power
+  Serial1.println(1);
   handleAcUpdate<bool>(
-      PIN_POWER, param.asInt() == 1, acState.power,
+      PIN_POWER, param.asInt() == 1, acControllerState.power,
       [](bool v) {
+        Serial1.println(2);
         if (v)
           acControl.ac.on();
         else
@@ -77,47 +84,47 @@ BLYNK_WRITE(V0) {  // Power
       "power", false);
 }
 
-BLYNK_WRITE(V1) {  // Temperature
+BLYNK_WRITE(V1) {  // Power
   handleAcUpdate<uint8_t>(
-      PIN_TEMP, param.asInt(), acState.temp,
+      PIN_TEMP, param.asInt(), acControllerState.temp,
       [](uint8_t v) { acControl.ac.setTemp(v, true); },
       "temperature (celsius)");
 }
 
 BLYNK_WRITE(V2) {  // Mode
   handleAcUpdate<uint8_t>(
-      PIN_MODE, param.asInt(), acState.mode,
+      PIN_MODE, param.asInt(), acControllerState.mode,
       [](uint8_t v) { acControl.ac.setMode(v); }, "mode", true, modeToString);
 }
 
 BLYNK_WRITE(V3) {  // Fan Speed
   handleAcUpdate<uint8_t>(
-      PIN_FAN, param.asInt(), acState.fanSpeed,
+      PIN_FAN, param.asInt(), acControllerState.fanSpeed,
       [](uint8_t v) { acControl.ac.setFan(v); }, "fan speed", true,
       fanSpeedToString);
 }
 
 BLYNK_WRITE(V4) {  // Swing
   handleAcUpdate<bool>(
-      PIN_SWING, param.asInt() == 1, acState.swing,
+      PIN_SWING, param.asInt() == 1, acControllerState.swing,
       [](bool v) { acControl.ac.setSwingVToggle(v); }, "swing");
 }
 
 BLYNK_WRITE(V5) {  // Sleep
   handleAcUpdate<bool>(
-      PIN_SLEEP, param.asInt() == 1, acState.sleep,
+      PIN_SLEEP, param.asInt() == 1, acControllerState.sleep,
       [](bool v) { acControl.ac.setSleep(v); }, "sleep");
 }
 
 BLYNK_WRITE(V6) {  // Clean
   handleAcUpdate<bool>(
-      PIN_CLEAN, param.asInt() == 1, acState.clean,
+      PIN_CLEAN, param.asInt() == 1, acControllerState.clean,
       [](bool v) { acControl.ac.setCleanToggle(v); }, "clean");
 }
 
 BLYNK_WRITE(V7) {  // LED Display
   handleAcUpdate<bool>(
-      PIN_LED, param.asInt() == 1, acState.ledDisplay,
+      PIN_LED, param.asInt() == 1, acControllerState.ledDisplay,
       [](bool v) { acControl.ac.setLightToggle(v); }, "LED display");
 }
 

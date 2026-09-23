@@ -29,6 +29,7 @@ class SyncGuard {
   void checkTimeout(unsigned long timeout_ms) {
     if (active_ && (millis() - start_time_ms_ > timeout_ms)) {
       pending_mask_ = 0;
+      LOG_WARN("Sync timeout after {} ms.", timeout_ms);
       finishCallback();
     }
   }
