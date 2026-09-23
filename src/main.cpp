@@ -19,9 +19,13 @@ void setup() {
   Serial.begin(115200);
   LOG_BEGIN(9600);
 
+  auto blynkVirtualWrite = [](uint8_t pin, int value) {
+    Blynk.virtualWrite(pin, value);
+  };
+
+  acControlState.begin(VPControlOnESP, blynkVirtualWrite);
   acControl.begin();
-  acReceive.begin(
-      [](uint8_t pin, int value) { Blynk.virtualWrite(pin, value); });
+  acReceive.begin(blynkVirtualWrite);
   Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS);
 }
 
@@ -35,7 +39,8 @@ BLYNK_CONNECTED() {
   LOG_INFO("Blynk connected, syncing virtual pins.");
   syncGuard.begin(PIN_COUNT);
   syncGuard.onFinished([](SyncGuard::Callback pc) {
-    LOG_INFO("Sync finished.");
+    LOG_INFO("Sync finished.\n");
+    if (acControlState.isEspOnControl()) acControl.send(syncGuard);
     if (pc) pc();
   });
   Blynk.syncAll();
@@ -46,11 +51,11 @@ template <typename T>
 void handleAcUpdate(AcPin pin, T val, T& stateVar,
                     std::function<void(T)> applyFunc, const char* name,
                     bool isLowPriority = true,
-                    std::function<String(T)> toStr = nullptr) {
+                    std::function<String(T)> toStr = nullptr,
+                    bool send = true) {
   applyFunc(val);
   stateVar = val;
   String val_in_log = toStr ? toStr(val) : String(val);
-  Serial1.println(3);
 
   if (std::is_same<T, bool>::value) {
     LOG_INFO("AC {} state changed to: {}", name, val ? "ON" : "OFF");
@@ -58,20 +63,19 @@ void handleAcUpdate(AcPin pin, T val, T& stateVar,
     LOG_INFO("AC {} changed to: {}", name, val_in_log.c_str());
   }
 
-  if (isLowPriority) {
-    acControl.sendLowPriority(syncGuard);
-  } else {
-    acControl.send(syncGuard);
+  if (send) {
+    if (isLowPriority) {
+      acControl.sendLowPriority(syncGuard);
+    } else {
+      acControl.send(syncGuard);
+    }
   }
 
-  Serial1.println(4);
   syncGuard.tick(pin);
-  Serial1.println(5);
 }
 
 // Blynk pin handlers
 BLYNK_WRITE(V0) {  // Power
-  Serial1.println(1);
   handleAcUpdate<bool>(
       PIN_POWER, param.asInt() == 1, acControllerState.power,
       [](bool v) {
@@ -142,4 +146,14 @@ BLYNK_WRITE(V9) {  // Timer off (param: hours, ac: minutes)
   handleAcUpdate<uint16_t>(
       PIN_TIMER_OFF, minutes, dummyState,
       [](uint16_t v) { acControl.ac.setOffTimer(v); }, "timer off (minutes)");
+}
+
+BLYNK_WRITE(V20) {  // ESP On Control
+  bool dummyState;
+  bool value = param.asInt() == 1;
+  handleAcUpdate<bool>(
+      PIN_ESP_ON_CONTROL, value, dummyState,
+      [](bool v) { acControlState.set(v, true); }, "ESP on control", false,
+      // only send on esp on control
+      nullptr, value);
 }
