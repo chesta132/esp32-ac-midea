@@ -16,7 +16,7 @@ const unsigned long SYNC_TIMEOUT_MS = 5000;
 
 void setup() {
   Serial.begin(115200);
-  LOG_BEGIN(9600);
+  LOG_BEGIN(115200);
 
   acService.begin();
   Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS);
