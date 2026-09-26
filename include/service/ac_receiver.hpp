@@ -21,6 +21,7 @@ class AcReceiverService {
   void begin(void (*blynkVirtualWrite)(uint8_t, int)) {
     blynkVirtualWrite_ = blynkVirtualWrite;
     irrecv.enableIRIn();
+    ac.setUseCelsius(true);
     LOG_INFO("Midea AC IR receiver ready.");
   }
 
@@ -34,7 +35,7 @@ class AcReceiverService {
       ac.setRaw(results.value);
 
       bool power = ac.getPower();
-      uint8_t temp = ac.getTemp();
+      uint8_t temp = ac.getTemp(true);
       uint8_t mode = ac.getMode();
       uint8_t fanSpeed = ac.getFan();
       bool swing = ac.getSwingVToggle();

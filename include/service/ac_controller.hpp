@@ -16,6 +16,7 @@ class AcControllerService {
 
   void begin() {
     ac.begin();
+    ac.setUseCelsius(true);
     LOG_INFO("Midea AC IR controller ready.");
   }
 
