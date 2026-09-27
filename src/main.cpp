@@ -31,7 +31,8 @@ void setup() {
 
 void loop() {
   Blynk.run();
-  syncGuard.checkTimeout(SYNC_TIMEOUT_MS);
+  syncGuard.loop();
+  
   acReceive.loop();
   acControl.loop();
 }
@@ -39,7 +40,7 @@ void loop() {
 BLYNK_CONNECTED() {
   LOG_INFO(
       "Blynk connected, syncing virtual pins. Can not send IR while syncing.");
-  syncGuard.begin(PIN_COUNT);
+  syncGuard.begin(PIN_COUNT, SYNC_TIMEOUT_MS);
   syncGuard.onFinished([](SyncGuard::Callback pc) {
     LOG_INFO("Sync finished.\n");
     if (acControlState.isEspOnControl()) acControl.send(syncGuard);
