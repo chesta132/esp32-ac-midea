@@ -28,7 +28,6 @@ class AcReceiverService {
   }
 
   void loop() {
-    shared.loop();
     if (irrecv.decode(&results)) {
       if (results.decode_type != MIDEA) {
         irrecv.resume();

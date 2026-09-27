@@ -11,6 +11,7 @@
 #include "service/ac_receiver.hpp"
 #include "state.hpp"
 #include "sync_guard.hpp"
+#include "timer.hpp"
 
 SyncGuard syncGuard;
 const unsigned long SYNC_TIMEOUT_MS = 5000;
@@ -31,10 +32,9 @@ void setup() {
 
 void loop() {
   Blynk.run();
+  timer.tick();
   syncGuard.loop();
-  
   acReceive.loop();
-  acControl.loop();
 }
 
 BLYNK_CONNECTED() {

@@ -61,8 +61,6 @@ class AcControllerService {
 
   void setSleep(bool on) { shared.setSleep(on, VirtualPin::VPSleep); }
 
-  void loop() { shared.loop(); }
-
   IRMideaAC ac;
 
  private:

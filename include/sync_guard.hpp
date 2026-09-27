@@ -5,6 +5,8 @@
 
 #include <functional>
 
+#include "timer.hpp"
+
 // Tracks a checklist of pins expected during a sync, so IR commands
 // can be suppressed until every expected pin has reported in (or timed out).
 class SyncGuard {
@@ -19,7 +21,7 @@ class SyncGuard {
     cancelTimeout();
     if (active_) {
       timeout_ms_ = timeout_ms;
-      timeout_task_ = timer_.in(
+      timeout_task_ = timer.in(
           timeout_ms,
           [](void* arg) -> bool {
             static_cast<SyncGuard*>(arg)->onTimeout();
@@ -57,7 +59,7 @@ class SyncGuard {
   // True while any expected pin hasn't reported in yet.
   bool isSyncing() const { return active_; }
 
-  void loop() { timer_.tick(); }
+  void loop() { timer.tick(); }
 
  private:
   void onTimeout() {
@@ -69,7 +71,7 @@ class SyncGuard {
 
   void cancelTimeout() {
     if (timeout_task_) {
-      timer_.cancel(timeout_task_);
+      timer.cancel(timeout_task_);
       timeout_task_ = nullptr;
     }
   }
@@ -79,7 +81,6 @@ class SyncGuard {
     if (callback_) callback_();
   }
 
-  Timer<> timer_ = timer_create_default();
   Timer<>::Task timeout_task_ = nullptr;
   uint32_t pending_mask_ = 0;
   bool active_ = false;

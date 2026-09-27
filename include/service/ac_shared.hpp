@@ -8,6 +8,7 @@
 #include <ir_Midea.h>
 
 #include "helper.hpp"
+#include "timer.hpp"
 
 class AcSharedService {
  public:
@@ -32,12 +33,9 @@ class AcSharedService {
     }
   }
 
-  void loop() { timer.tick(); }
-
  private:
   IRMideaAC ac;
-  Timer<> timer = timer_create_default();
-  void* sleepTask_;
+  Timer<>::Task sleepTask_;
 
   struct TimerContext {
     AcSharedService* self;
