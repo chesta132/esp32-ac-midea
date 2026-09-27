@@ -78,8 +78,15 @@ void handleAcUpdate(AcPin pin, T val, T& stateVar,
 
 // Blynk pin handlers
 BLYNK_WRITE(V0) {  // Power
+  uint8_t value = param.asInt();
+  if (!value && acControllerState.sleep) {
+    Blynk.virtualWrite(VirtualPin::VPSleep, 0);
+    acControl.setSleep(false);
+    syncGuard.tick(PIN_POWER);
+    return;
+  }
   handleAcUpdate<bool>(
-      PIN_POWER, param.asInt() == 1, acControllerState.power,
+      PIN_POWER, value == 1, acControllerState.power,
       [](bool v) {
         if (v)
           acControl.ac.on();
@@ -89,7 +96,7 @@ BLYNK_WRITE(V0) {  // Power
       "power", false);
 }
 
-BLYNK_WRITE(V1) {  // Power
+BLYNK_WRITE(V1) {  // Temperature
   handleAcUpdate<uint8_t>(
       PIN_TEMP, param.asInt(), acControllerState.temp,
       [](uint8_t v) { acControl.ac.setTemp(v, true); },
@@ -115,7 +122,13 @@ BLYNK_WRITE(V4) {  // Swing
       [](bool v) { acControl.ac.setSwingVToggle(v); }, "swing");
 }
 
+// only allow sleep on power on
 BLYNK_WRITE(V5) {  // Sleep
+  if (!acControllerState.power) {
+    Blynk.virtualWrite(VirtualPin::VPSleep, 0);
+    syncGuard.tick(PIN_SLEEP);
+    return;
+  }
   handleAcUpdate<bool>(
       PIN_SLEEP, param.asInt() == 1, acControllerState.sleep,
       [](bool v) { acControl.setSleep(v); }, "sleep");
