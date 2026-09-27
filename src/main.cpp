@@ -24,7 +24,7 @@ void setup() {
   };
 
   acControlState.begin(VPControlOnESP, blynkVirtualWrite);
-  acControl.begin();
+  acControl.begin(blynkVirtualWrite);
   acReceive.begin(blynkVirtualWrite);
   Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS);
 }
@@ -33,6 +33,7 @@ void loop() {
   Blynk.run();
   syncGuard.checkTimeout(SYNC_TIMEOUT_MS);
   acReceive.loop();
+  acControl.loop();
 }
 
 BLYNK_CONNECTED() {
@@ -117,7 +118,7 @@ BLYNK_WRITE(V4) {  // Swing
 BLYNK_WRITE(V5) {  // Sleep
   handleAcUpdate<bool>(
       PIN_SLEEP, param.asInt() == 1, acControllerState.sleep,
-      [](bool v) { acControl.ac.setSleep(v); }, "sleep");
+      [](bool v) { acControl.setSleep(v); }, "sleep");
 }
 
 BLYNK_WRITE(V6) {  // Clean

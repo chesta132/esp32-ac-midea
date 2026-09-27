@@ -7,6 +7,7 @@
 #include <ir_Midea.h>
 
 #include "enum.hpp"
+#include "service/ac_shared.hpp"
 #include "state.hpp"
 
 #define SYNC_IF_CHANGED(field, vpin, ...) \
@@ -16,9 +17,10 @@ extern decode_results results;
 
 class AcReceiverService {
  public:
-  AcReceiverService(uint8_t irPin) : ac(irPin), irrecv(irPin) {}
+  AcReceiverService(uint8_t irPin) : ac(irPin), irrecv(irPin), shared(ac) {}
 
   void begin(void (*blynkVirtualWrite)(uint8_t, int)) {
+    shared.begin(blynkVirtualWrite);
     blynkVirtualWrite_ = blynkVirtualWrite;
     irrecv.enableIRIn();
     ac.setUseCelsius(true);
@@ -26,6 +28,7 @@ class AcReceiverService {
   }
 
   void loop() {
+    shared.loop();
     if (irrecv.decode(&results)) {
       if (results.decode_type != MIDEA) {
         irrecv.resume();
@@ -54,6 +57,7 @@ class AcReceiverService {
         SYNC_IF_CHANGED(fanSpeed, VPFFanSpeed, fanSpeed);
         SYNC_IF_CHANGED(swing, VPFSwing, swing ? 1 : 0);
         SYNC_IF_CHANGED(sleep, VPFSleep, sleep ? 1 : 0);
+        shared.setSleep(sleep, VPFSleep);  // auto turn off after 8h
         SYNC_IF_CHANGED(clean, VPFClean, clean ? 1 : 0);
         SYNC_IF_CHANGED(ledDisplay, VPFLedDisplay, ledDisplay ? 1 : 0);
         SYNC_IF_CHANGED(timerOn, VPFTimerOn, timerOn);
@@ -80,6 +84,7 @@ class AcReceiverService {
  private:
   IRrecv irrecv;
   void (*blynkVirtualWrite_)(uint8_t, int);
+  AcSharedService shared;
 };
 
 extern AcReceiverService acReceive;

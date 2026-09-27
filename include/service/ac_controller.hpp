@@ -4,18 +4,23 @@
 #include <FormatLog.h>
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
+#include <arduino-timer.h>
 #include <ir_Midea.h>
 
 #include "config.hpp"
+#include "enum.hpp"
+#include "helper.hpp"
+#include "service/ac_shared.hpp"
 #include "state.hpp"
 #include "sync_guard.hpp"
 
 class AcControllerService {
  public:
-  AcControllerService(uint8_t irPin) : ac(irPin) {}
+  AcControllerService(uint8_t irPin) : ac(irPin), shared(ac) {}
 
-  void begin() {
+  void begin(void (*blynkVirtualWrite)(uint8_t, int)) {
     ac.begin();
+    shared.begin(blynkVirtualWrite);
     ac.setUseCelsius(true);
     LOG_INFO("Midea AC IR controller ready.");
   }
@@ -54,15 +59,22 @@ class AcControllerService {
     }
   }
 
+  void setSleep(bool on) { shared.setSleep(on, VirtualPin::VPSleep); }
+
+  void loop() { shared.loop(); }
+
   IRMideaAC ac;
 
  private:
   void beforeSend_() {
-    // if (!acControlState.isEspOnControl()) {
-    //   acControlState.set(true);
-    //   LOG_INFO("AC ESP is taking control.");
-    // }
+    if (!acControlState.isEspOnControl()) {
+      acControlState.set(true);
+      LOG_INFO("AC ESP is taking control.");
+    }
   }
+
+  void (*blynkVirtualWrite_)(uint8_t, int);
+  AcSharedService shared;
 };
 
 extern AcControllerService acControl;
