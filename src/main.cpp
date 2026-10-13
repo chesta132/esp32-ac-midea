@@ -13,7 +13,7 @@
 #include "sync_guard.hpp"
 #include "timer.hpp"
 
-SyncGuard syncGuard;
+SyncGuard syncGuard(timer);
 const unsigned long SYNC_TIMEOUT_MS = 5000;
 
 void setup() {
@@ -33,7 +33,6 @@ void setup() {
 void loop() {
   Blynk.run();
   timer.tick();
-  syncGuard.loop();
   acReceive.loop();
 }
 

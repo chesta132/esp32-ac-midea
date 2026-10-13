@@ -11,9 +11,12 @@
 // can be suppressed until every expected pin has reported in (or timed out).
 class SyncGuard {
  public:
+  SyncGuard(Timer<> timer) : timer(timer) {}
+
   // Register a pin (e.g. 0 for V0, 1 for V1, ...) as "expected" for the
   // next sync cycle and arm a timeout of `timeout_ms`. Call once when a
-  // sync starts (replaces the old begin(pin_count) + per-loop checkTimeout).
+  // sync starts (replaces the old begin(pin_count) + per-loop
+  // checkTimeout).
   void begin(uint8_t pin_count, unsigned long timeout_ms) {
     pending_mask_ = (pin_count >= 32) ? 0xFFFFFFFF : ((1UL << pin_count) - 1);
     active_ = pending_mask_ != 0;
@@ -59,8 +62,6 @@ class SyncGuard {
   // True while any expected pin hasn't reported in yet.
   bool isSyncing() const { return active_; }
 
-  void loop() { timer.tick(); }
-
  private:
   void onTimeout() {
     pending_mask_ = 0;
@@ -81,6 +82,7 @@ class SyncGuard {
     if (callback_) callback_();
   }
 
+  Timer<> timer;
   Timer<>::Task timeout_task_ = nullptr;
   uint32_t pending_mask_ = 0;
   bool active_ = false;
