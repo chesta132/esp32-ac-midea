@@ -7,18 +7,22 @@
     {
       "type": "wokwi-resistor",
       "id": "r1",
-      "top": 99.95,
-      "left": 134.4,
+      "top": 167.15,
+      "left": 144,
       "attrs": { "value": "220" }
     },
-    { "type": "wokwi-ir-led", "id": "ir1", "top": 34.8, "left": -111.4, "attrs": {} }
+    { "type": "wokwi-ir-led", "id": "ir1", "top": 34.8, "left": -111.4, "attrs": {} },
+    { "type": "wokwi-ir-receiver", "id": "ir2", "top": -106.95, "left": 113.42, "attrs": {} }
   ],
   "connections": [
     ["esp:TX", "$serialMonitor:RX", "", []],
     ["esp:RX", "$serialMonitor:TX", "", []],
     ["esp:4", "r1:1", "green", ["h0"]],
     ["r1:2", "ir1:A", "green", ["v0.07", "h-10"]],
-    ["esp:GND.1", "ir1:C", "black", ["h0"]]
+    ["esp:GND.1", "ir1:C", "black", ["h0"]],
+    ["ir2:GND", "esp:GND.3", "black", ["v0"]],
+    ["ir2:VCC", "esp:3V3", "red", ["v0"]],
+    ["ir2:DAT", "esp:5", "green", ["v0"]]
   ],
   "dependencies": {}
 }

@@ -12,11 +12,13 @@ An Embedded C++ IoT project built with **PlatformIO** for controlling and monito
 │   ├── config.hpp         # Hardware pins & global constants
 │   ├── state.hpp          # Application state definitions
 │   ├── sync_guard.hpp     # Thread/sync locks for state management
-│   └── ac_service.hpp     # AC IR protocol and service logic
+│   ├── enum.hpp           # Enum related
+│   └── service            # AC Controller & Receiver service
 ├── src/
 │   ├── main.cpp           # Main application entry point
 │   ├── state.cpp          # State implementation details
-│   └── ac_service.cpp     # AC service implementation
+│   ├── enum.cpp           # Enum implementation
+│   └── ac_service.cpp     # service/ implementation
 ├── scripts/
 │   └── load_env.py        # Environment loader script for build configurations
 ├── lib/                   # Custom libraries & local modules
@@ -35,6 +37,7 @@ An Embedded C++ IoT project built with **PlatformIO** for controlling and monito
 - **State Guard & Thread Safety:** Utilizes custom sync guards (`sync_guard.hpp`) to maintain state integrity across async operations.
 - **Wokwi Simulation Ready:** Integrated circuit diagrams (`diagram.json`) and Wokwi runner configurations (`wokwi.toml`).
 - **Dynamic Config Loading:** Auto-loads variables from `.env` using Python pre-build scripts.
+- **Double State:** State separated by ESP32 and factory's remote (updated via IR Receiver)
 
 ---
 
@@ -52,7 +55,7 @@ An Embedded C++ IoT project built with **PlatformIO** for controlling and monito
 
    ```bash
    git clone https://github.com/chesta132/esp32-ac-midea.git
-   cd your-repo-name
+   cd esp32-ac-midea
    ```
 
 2. **Configure Environment:**
@@ -80,9 +83,10 @@ An Embedded C++ IoT project built with **PlatformIO** for controlling and monito
 
 Default pin assignments are defined in `include/config.hpp`.
 
-| Component              | Pin      | Description                       |
-| :--------------------- | :------- | :-------------------------------- |
-| **IR Transmitter LED** | `GPIO 4` | Sends IR raw codes to the AC unit |
+| Component          | Pin      | Description                              |
+| :----------------- | :------- | :--------------------------------------- |
+| **IR Transmitter** | `GPIO 4` | Sends IR raw codes to the AC unit        |
+| **IR Receiver**    | `GPIO 5` | Receives IR raw from AC factory's remote |
 
 _Modify `include/config.hpp` if your hardware setup differs._
 

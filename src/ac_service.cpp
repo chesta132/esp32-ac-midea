@@ -1,3 +1,7 @@
-#include "ac_service.hpp"
+#include "service/ac_controller.hpp"
+#include "service/ac_receiver.hpp"
 
-AcService acService(PIN_IR_LED);
+AcControllerService acControl(PIN_IR_LED);
+AcReceiverService acReceive(PIN_IR_RECEIVER);
+
+decode_results results;
