@@ -12,9 +12,20 @@
 #include "state.hpp"
 #include "sync_guard.hpp"
 #include "timer.hpp"
+#include "wifi.hpp"
 
 SyncGuard syncGuard(timer);
 const unsigned long SYNC_TIMEOUT_MS = 5000;
+
+bool reconnectTask(void*) {
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.disconnect();
+    connectWifi();
+  } else if (!Blynk.connected()) {
+    Blynk.connect(3000);
+  }
+  return true;
+}
 
 void setup() {
   Serial.begin(115200);
@@ -27,12 +38,15 @@ void setup() {
   acControlState.begin(VPControlOnESP, blynkVirtualWrite);
   acControl.begin(blynkVirtualWrite);
   acReceive.begin(blynkVirtualWrite);
-  Blynk.begin(BLYNK_AUTH_TOKEN, WIFI_SSID, WIFI_PASS);
+
+  Blynk.config(BLYNK_AUTH_TOKEN);
+  initializeWiFi();
+  timer.every(10000, reconnectTask);
 }
 
 void loop() {
-  Blynk.run();
   timer.tick();
+  if (Blynk.connected()) Blynk.run();
   acReceive.loop();
 }
 
