@@ -17,13 +17,22 @@
 SyncGuard syncGuard(timer);
 const unsigned long SYNC_TIMEOUT_MS = 5000;
 
+static uint8_t wifiDownTicks = 0;
+static uint8_t autoReconnectAt = 10_s;
+
 bool reconnectTask(void*) {
   if (WiFi.status() != WL_CONNECTED) {
-    WiFi.disconnect();
-    connectWifi();
-  } else if (!Blynk.connected()) {
-    Blynk.connect(3000);
+    // only kick connection every 60 seconds (6 ticks of 10s each)
+    // auto reconnect already handled by WiFi.setAutoReconnect(true)
+    if (++wifiDownTicks >= 60_s / autoReconnectAt) {
+      wifiDownTicks = 0;
+      WiFi.disconnect();
+      connectWifi();
+    }
+    return true;
   }
+  wifiDownTicks = 0;
+  if (!Blynk.connected()) Blynk.connect(3000);
   return true;
 }
 
@@ -46,7 +55,7 @@ void setup() {
 
   Blynk.config(BLYNK_AUTH_TOKEN);
   initializeWiFi();
-  timer.every(10000, reconnectTask);
+  timer.every(autoReconnectAt, reconnectTask);
 }
 
 void loop() {
