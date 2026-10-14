@@ -11,7 +11,7 @@
 // can be suppressed until every expected pin has reported in (or timed out).
 class SyncGuard {
  public:
-  SyncGuard(Timer<> timer) : timer(timer) {}
+  SyncGuard(Timer<>& timer) : timer(timer) {}
 
   // Register a pin (e.g. 0 for V0, 1 for V1, ...) as "expected" for the
   // next sync cycle and arm a timeout of `timeout_ms`. Call once when a
@@ -82,7 +82,7 @@ class SyncGuard {
     if (callback_) callback_();
   }
 
-  Timer<> timer;
+  Timer<>& timer;
   Timer<>::Task timeout_task_ = nullptr;
   uint32_t pending_mask_ = 0;
   bool active_ = false;

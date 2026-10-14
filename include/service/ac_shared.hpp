@@ -12,7 +12,7 @@
 
 class AcSharedService {
  public:
-  AcSharedService(IRMideaAC ac_) : ac(ac_) {}
+  AcSharedService(IRMideaAC& ac_) : ac(ac_) {}
 
   void begin(void (*blynkVirtualWrite)(uint8_t, int)) {
     blynkVirtualWrite_ = blynkVirtualWrite;
@@ -34,7 +34,7 @@ class AcSharedService {
   }
 
  private:
-  IRMideaAC ac;
+  IRMideaAC& ac;
   Timer<>::Task sleepTask_;
 
   struct TimerContext {
