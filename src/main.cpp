@@ -34,6 +34,11 @@ void setup() {
   auto blynkVirtualWrite = [](uint8_t pin, int value) {
     Blynk.virtualWrite(pin, value);
   };
+  syncGuard.onFinished([](SyncGuard::Callback pc) {
+    LOG_INFO("Sync finished.\n");
+    if (acControlState.isEspOnControl()) acControl.send(syncGuard);
+    if (pc) pc();
+  });
 
   acControlState.begin(VPControlOnESP, blynkVirtualWrite);
   acControl.begin(blynkVirtualWrite);
@@ -54,11 +59,6 @@ BLYNK_CONNECTED() {
   LOG_INFO(
       "Blynk connected, syncing virtual pins. Can not send IR while syncing.");
   syncGuard.begin(PIN_COUNT, SYNC_TIMEOUT_MS);
-  syncGuard.onFinished([](SyncGuard::Callback pc) {
-    LOG_INFO("Sync finished.\n");
-    if (acControlState.isEspOnControl()) acControl.send(syncGuard);
-    if (pc) pc();
-  });
   Blynk.syncAll();
 }
 
