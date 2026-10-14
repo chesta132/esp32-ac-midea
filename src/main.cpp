@@ -17,8 +17,8 @@
 SyncGuard syncGuard(timer);
 const unsigned long SYNC_TIMEOUT_MS = 5000;
 
-static uint8_t wifiDownTicks = 0;
-static uint8_t autoReconnectAt = 10_s;
+static long autoReconnectAt = 10_s;
+static uint8_t wifiDownTicks = 60_s / autoReconnectAt;  // start with a kick to connect wifi on boot
 
 bool reconnectTask(void*) {
   if (WiFi.status() != WL_CONNECTED) {
